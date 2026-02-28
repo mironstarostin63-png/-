@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Элитное Меню</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #d4af37;
+            --light-gold: #f1e5ac;
+            --dark-overlay: rgba(18, 18, 18, 0.85);
+        }
+
+        body { 
+            font-family: 'Playfair Display', serif; 
+            background: #121212;
+            /* Фон с винными пробками */
+            background-image: linear-gradient(var(--dark-overlay), var(--dark-overlay)), url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: #ffffff;
+            margin: 0;
+            padding: 60px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        #back-btn { 
+            position: fixed; top: 40px; left: 30px; display: none; 
+            background: none; color: var(--gold); border: 1px solid var(--gold); 
+            padding: 10px 20px; border-radius: 0; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 2px; font-family: 'Cinzel', serif;
+            transition: 0.3s; z-index: 100;
+        }
+
+        h1 { 
+            font-family: 'Cinzel', serif; font-size: 3.5rem; color: var(--gold); 
+            text-transform: uppercase; letter-spacing: 12px; margin-bottom: 80px; 
+            text-align: center; border-bottom: 2px solid var(--gold); padding-bottom: 20px;
+        }
+
+        /* Список в один столбик */
+        .column-menu { 
+            display: flex; flex-direction: column; gap: 40px; 
+            width: 100%; max-width: 600px; 
+        }
+
+        .menu-row {
+            cursor: pointer; padding: 20px 0;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+        }
+
+        .menu-row:hover {
+            border-bottom: 1px solid var(--gold);
+            letter-spacing: 1px;
+        }
+
+        .category-name {
+            font-size: 1.8rem; color: var(--gold); text-transform: uppercase;
+            letter-spacing: 4px; display: block; margin-bottom: 8px;
+        }
+
+        /* Окно выбора */
+        .category-view { 
+            display: none; width: 100%; max-width: 550px; 
+            opacity: 0; transition: opacity 0.5s ease;
+        }
+
+        .option { 
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 25px 0; border-bottom: 1px dotted var(--gold);
+            font-size: 1.4rem; font-style: italic;
+        }
+
+        /* Плавная галочка */
+        input[type="checkbox"] { 
+            width: 28px; height: 28px; accent-color: var(--gold); 
+            cursor: pointer; transition: transform 0.3s ease;
+        }
+        input[type="checkbox"]:checked { transform: scale(1.2); }
+
+        /* Плавное появление кнопки ОТПРАВИТЬ */
+        #send-order-btn { 
+            opacity: 0; visibility: hidden; width: 100%; 
+            background: var(--gold); color: #000; border: none; 
+            padding: 22px; font-size: 1.3rem; text-transform: uppercase; 
+            letter-spacing: 5px; font-family: 'Cinzel', serif; font-weight: bold;
+            margin-top: 60px; cursor: pointer; transition: all 0.6s ease;
+        }
+
+        #send-order-btn.visible {
+            opacity: 1; visibility: visible; transform: translateY(0);
+        }
+
+        .waiter-link { 
+            color: #ffffff; text-decoration: underline; background: none; border: none;
+            margin-top: 50px; cursor: pointer; font-size: 0.9rem; letter-spacing: 2px;
+            opacity: 0.6; transition: 0.3s;
+        }
+        .waiter-link:hover { opacity: 1; color: var(--gold); }
+    </style>
+</head>
+<body>
+
+    <button id="back-btn" onclick="showMain()">← Назад</button>
+
+    <div id="main-menu" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+        <h1>Элитное Меню</h1>
+        <div class="column-menu">
+            <div class="menu-row" onclick="openCat('bread')"><span class="category-name">Хлебцы</span></div>
+            <div class="menu-row" onclick="openCat('shakshuka')"><span class="category-name">Фирменная Шакшука</span></div>
+            <div class="menu-row" onclick="openCat('pasta')"><span class="category-name">Горячая Паста</span></div>
+            <div class="menu-row" onclick="openCat('croutons')"><span class="category-name">Хрустящие Гренки</span></div>
+            <div class="menu-row" onclick="openCat('salad')"><span class="category-name">Свежий Салат</span></div>
+            <div class="menu-row" onclick="openCat('chips')"><span class="category-name">Хрустящие Чипсы</span></div>
+            <div class="menu-row" onclick="openCat('tea')"><span class="category-name">Горячий Чай</span></div>
+            <div class="menu-row" onclick="openCat('dessert')"><span class="category-name">Сладкие Десерты</span></div>
+        </div>
+        <button class="waiter-link" onclick="callWaiter()">Пригласить официанта</button>
+    </div>
+
+    <div id="cat-view" class="category-view">
+        <h2 id="cat-title" style="text-align:center; color:var(--gold); font-size: 2.8rem; margin-bottom: 50px; font-family: 'Cinzel';"></h2>
+        <div id="options-list"></div>
+        <button id="send-order-btn" onclick="sendOrder()">Отправить заказ</button>
+    </div>
+
+    <script>
+        // Данные из твоих настроек
+        emailjs.init("HnFVx9m2zPmPYKWiO"); 
+
+        const data = {
+            bread: { title: "Хлебцы", opts: ["Золотистые тосты", "С томатами на гриле", "Свежий хлеб"] },
+            shakshuka: { title: "Шакшука", opts: ["С тягучим сыром", "Свежая зелень", "Классическая пряная"] },
+            pasta: { title: "Паста", opts: ["Карбонара", "Четыре сыра", "С лесными грибами"] },
+            croutons: { title: "Гренки", opts: ["Чесночные", "С сыром", "Острые Чили"] },
+            salad: { title: "Салаты", opts: ["Цезарь", "Греческий", "Витаминный микс"] },
+            chips: { title: "Чипсы", opts: ["С паприкой", "Сметаной и луком", "Морская соль"] },
+            tea: { title: "Чай", opts: ["Иван-чай", "Облепиховый", "Ромашковый", "Печеночный", "Желудочный"] },
+            dessert: { title: "Десерты", opts: ["Бабл-гам", "Шоколадное мороженое", "Шоколад", "Спелый банан"] }
+        };
+
+        let currentOrder = new Set();
+
+        function openCat(id) {
+            document.getElementById('main-menu').style.display = 'none';
+            const view = document.getElementById('cat-view');
+            view.style.display = 'block';
+            setTimeout(() => view.style.opacity = '1', 10);
+            document.getElementById('back-btn').style.display = 'block';
+            
+            const cat = data[id];
+            document.getElementById('cat-title').innerText = cat.title;
+            document.getElementById('options-list').innerHTML = cat.opts.map(opt => `
+                <div class="option">
+                    <span>${opt}</span>
+                    <input type="checkbox" onchange="toggleOrder('${opt}')" ${currentOrder.has(opt) ? 'checked' : ''}>
+                </div>
+            `).join('');
+            checkOrderButton();
+        }
+
+        function showMain() {
+            document.getElementById('main-menu').style.display = 'flex';
+            document.getElementById('cat-view').style.display = 'none';
+            document.getElementById('cat-view').style.opacity = '0';
+            document.getElementById('back-btn').style.display = 'none';
+        }
+
+        function toggleOrder(val) {
+            currentOrder.has(val) ? currentOrder.delete(val) : currentOrder.add(val);
+            checkOrderButton();
+        }
+
+        function checkOrderButton() {
+            const btn = document.getElementById('send-order-btn');
+            if (currentOrder.size > 0) {
+                btn.classList.add('visible');
+            } else {
+                btn.classList.remove('visible');
+            }
+        }
+
+        function sendOrder() {
+            const orderStr = Array.from(currentOrder).join(", ");
+            // Отправка на твой email
+            emailjs.send("service_8ktnzor", "template_default", { message: orderStr })
+            .then(() => {
+                alert("Благодарим. Ваш заказ принят.");
+                currentOrder.clear();
+                showMain();
+            });
+        }
+
+        function callWaiter() {
+            emailjs.send("service_8ktnzor", "template_default", { message: "🔔 ВЫЗОВ ОФИЦИАНТА" })
+            .then(() => alert("Официант приглашен."));
+        }
+    </script>
+</body>
+</html>
