@@ -2,207 +2,170 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Элитное Меню</title>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VIP МЕНЮ</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --gold: #d4af37;
-            --light-gold: #f1e5ac;
-            --dark-overlay: rgba(18, 18, 18, 0.85);
-        }
-
+        :root { --gold: #c5a059; --bg: #0a0a0a; --card: #141414; }
         body { 
-            font-family: 'Playfair Display', serif; 
-            background: #121212;
-            /* Фон с винными пробками */
-            background-image: linear-gradient(var(--dark-overlay), var(--dark-overlay)), url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?q=80&w=2070&auto=format&fit=crop');
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-            color: #ffffff;
-            margin: 0;
-            padding: 60px 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            margin: 0; padding: 0; background: var(--bg); color: white;
+            font-family: 'Playfair Display', serif; display: flex; justify-content: center;
         }
-
-        #back-btn { 
-            position: fixed; top: 40px; left: 30px; display: none; 
-            background: none; color: var(--gold); border: 1px solid var(--gold); 
-            padding: 10px 20px; border-radius: 0; cursor: pointer;
-            text-transform: uppercase; letter-spacing: 2px; font-family: 'Cinzel', serif;
-            transition: 0.3s; z-index: 100;
+        .app-container {
+            width: 100%; max-width: 600px; padding: 50px 20px;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
+            min-height: 100vh; position: relative; box-sizing: border-box;
         }
-
-        h1 { 
-            font-family: 'Cinzel', serif; font-size: 3.5rem; color: var(--gold); 
-            text-transform: uppercase; letter-spacing: 12px; margin-bottom: 80px; 
-            text-align: center; border-bottom: 2px solid var(--gold); padding-bottom: 20px;
+        .main-title {
+            font-family: 'Cinzel', serif; font-size: 2.5rem; text-align: center;
+            color: var(--gold); letter-spacing: 12px; margin-bottom: 60px;
         }
-
-        /* Список в один столбик */
-        .column-menu { 
-            display: flex; flex-direction: column; gap: 40px; 
-            width: 100%; max-width: 600px; 
+        .dish-card {
+            background: var(--card); border: 1px solid rgba(197, 160, 89, 0.3);
+            margin-bottom: 25px; transition: 0.4s; overflow: hidden;
         }
-
-        .menu-row {
-            cursor: pointer; padding: 20px 0;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: center;
+        .dish-header {
+            padding: 30px; cursor: pointer; display: flex; justify-content: center;
+            font-family: 'Cinzel', serif; font-size: 1.4rem; color: var(--gold);
+            letter-spacing: 5px; text-transform: uppercase;
         }
-
-        .menu-row:hover {
-            border-bottom: 1px solid var(--gold);
-            letter-spacing: 1px;
+        .sub-categories {
+            max-height: 0; opacity: 0; transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #0d0d0d;
         }
-
-        .category-name {
-            font-size: 1.8rem; color: var(--gold); text-transform: uppercase;
-            letter-spacing: 4px; display: block; margin-bottom: 8px;
+        .dish-card.active .sub-categories { max-height: 5000px; opacity: 1; padding-bottom: 20px; }
+        .sub-item {
+            padding: 25px 30px; border-top: 1px solid rgba(197, 160, 89, 0.15);
         }
-
-        /* Окно выбора */
-        .category-view { 
-            display: none; width: 100%; max-width: 550px; 
-            opacity: 0; transition: opacity 0.5s ease;
+        .sub-item-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
         }
-
-        .option { 
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 25px 0; border-bottom: 1px dotted var(--gold);
-            font-size: 1.4rem; font-style: italic;
+        .sub-name { font-size: 1.2rem; color: #fff; font-weight: bold; letter-spacing: 1px; }
+        .recipe-text {
+            font-size: 0.95rem; color: #999; font-style: italic; line-height: 1.6;
+            display: block; margin-top: 5px; text-align: justify;
         }
-
-        /* Плавная галочка */
-        input[type="checkbox"] { 
-            width: 28px; height: 28px; accent-color: var(--gold); 
-            cursor: pointer; transition: transform 0.3s ease;
+        .gold-check {
+            width: 28px; height: 28px; border: 2px solid var(--gold);
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
         }
-        input[type="checkbox"]:checked { transform: scale(1.2); }
-
-        /* Плавное появление кнопки ОТПРАВИТЬ */
-        #send-order-btn { 
-            opacity: 0; visibility: hidden; width: 100%; 
-            background: var(--gold); color: #000; border: none; 
-            padding: 22px; font-size: 1.3rem; text-transform: uppercase; 
-            letter-spacing: 5px; font-family: 'Cinzel', serif; font-weight: bold;
-            margin-top: 60px; cursor: pointer; transition: all 0.6s ease;
+        .selected .gold-check { background: var(--gold); box-shadow: 0 0 20px var(--gold); }
+        .gold-check::after { content: '✓'; color: black; display: none; font-weight: bold; font-size: 1.2rem; }
+        .selected .gold-check::after { display: block; }
+        
+        .order-btn {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 85%; max-width: 450px; background: var(--gold); color: black;
+            border: none; padding: 22px; font-family: 'Cinzel'; font-weight: bold;
+            letter-spacing: 5px; cursor: pointer; display: none; z-index: 1000;
         }
-
-        #send-order-btn.visible {
-            opacity: 1; visibility: visible; transform: translateY(0);
+        .call-staff {
+            text-align: center; margin-top: 60px; color: #555; font-size: 0.8rem;
+            letter-spacing: 4px; text-transform: uppercase; cursor: pointer;
         }
-
-        .waiter-link { 
-            color: #ffffff; text-decoration: underline; background: none; border: none;
-            margin-top: 50px; cursor: pointer; font-size: 0.9rem; letter-spacing: 2px;
-            opacity: 0.6; transition: 0.3s;
-        }
-        .waiter-link:hover { opacity: 1; color: var(--gold); }
     </style>
 </head>
 <body>
 
-    <button id="back-btn" onclick="showMain()">← Назад</button>
+<div class="app-container">
+    <h1 class="main-title">VIP МЕНЮ</h1>
+    <div id="menu-list"></div>
+    <div class="call-staff" onclick="call()">Вызвать персонал</div>
+</div>
 
-    <div id="main-menu" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-        <h1>Элитное Меню</h1>
-        <div class="column-menu">
-            <div class="menu-row" onclick="openCat('bread')"><span class="category-name">Хлебцы</span></div>
-            <div class="menu-row" onclick="openCat('shakshuka')"><span class="category-name">Фирменная Шакшука</span></div>
-            <div class="menu-row" onclick="openCat('pasta')"><span class="category-name">Горячая Паста</span></div>
-            <div class="menu-row" onclick="openCat('croutons')"><span class="category-name">Хрустящие Гренки</span></div>
-            <div class="menu-row" onclick="openCat('salad')"><span class="category-name">Свежий Салат</span></div>
-            <div class="menu-row" onclick="openCat('chips')"><span class="category-name">Хрустящие Чипсы</span></div>
-            <div class="menu-row" onclick="openCat('tea')"><span class="category-name">Горячий Чай</span></div>
-            <div class="menu-row" onclick="openCat('dessert')"><span class="category-name">Сладкие Десерты</span></div>
-        </div>
-        <button class="waiter-link" onclick="callWaiter()">Пригласить официанта</button>
-    </div>
+<button id="submitBtn" class="order-btn" onclick="send()">Отправить заказ</button>
 
-    <div id="cat-view" class="category-view">
-        <h2 id="cat-title" style="text-align:center; color:var(--gold); font-size: 2.8rem; margin-bottom: 50px; font-family: 'Cinzel';"></h2>
-        <div id="options-list"></div>
-        <button id="send-order-btn" onclick="sendOrder()">Отправить заказ</button>
-    </div>
+<script>
+    emailjs.init("HnFVx9m2zPmPYKWiO");
 
-    <script>
-        // Данные из твоих настроек
-        emailjs.init("HnFVx9m2zPmPYKWiO"); 
+    const menuData = [
+        { name: "Шакшука", items: [
+            {n: "Классическая", r: "Рецепт: Три яйца, томленые в густом соусе из спелых томатов, болгарского перца, лука и чеснока с добавлением зиры и копченой паприки."},
+            {n: "С зеленью", r: "Рецепт: База из шпината, молодого петрушки и кинзы. Подается со свежим домашним сыром, кедровыми орешками и оливковым маслом."},
+            {n: "С чеддером", r: "Рецепт: Пряная томатная основа, запеченная под плотным слоем выдержанного чеддера до состояния тягучей золотистой корочки."}
+        ]},
+        { name: "Паста", items: [
+            {n: "Карбонара", r: "Рецепт: Спагетти из твердых сортов пшеницы, обжаренная свиная щековина гуанчиале, желтки и пекорино романо. Готовится без сливок."},
+            {n: "Сливочно-томатная", r: "Рецепт: Итальянская паста в шелковистом соусе из фермерских сливок, вяленых томатов, свежего базилика и молодого чеснока."},
+            {n: "С сыром", r: "Рецепт: Эмульсия из пяти видов благородных сыров (пармезан, чеддер, моцарелла, дор-блю, маасдам), расплавленных в густых сливках."}
+        ]},
+        { name: "Хлебцы и Гренки", items: [
+            {n: "Ржаные хлебцы", r: "Производство: Авторская ржаная закваска, 24 часа созревания. Выпекаются на каменном поду. Подаются с взбитым сливочным маслом."},
+            {n: "Чесночные гренки", r: "Рецепт: Ломтики бородинского хлеба, обжаренные до хруста в чесночном масле с добавлением крупной морской соли и укропа."},
+            {n: "Сырные гренки", r: "Рецепт: Хрустящий пшеничный багет, запеченный под корочкой из тертого пармезана с прованскими травами."}
+        ]},
+        { name: "Салаты", items: [
+            {n: "Цезарь", r: "Рецепт: Листья салата Романо, нежное филе на гриле, слайсы пармезана и авторский соус на основе анчоусов и оливкового масла."},
+            {n: "С помидорами", r: "Рецепт: Сочные грунтовые томаты, красный лук, базилик и масло первого отжима с капелькой бальзамического крема."},
+            {n: "Айсберг", r: "Рецепт: Хрустящие листья айсберга, свежий огурец, заправка из сока лайма и кунжутное семя для текстуры."}
+        ]},
+        { name: "Чипсы", items: [
+            {n: "С паприкой", r: "Производство: Тончайшая нарезка картофеля сорта Инноватор, обжарка в масле и посыпка натуральной копченой паприкой."},
+            {n: "С солью", r: "Производство: Классические домашние чипсы Artisan, подчеркнутые кристаллами чистой гималайской розовой соли."}
+        ]},
+        { name: "Чай", items: [
+            {n: "Облепиховый", r: "Рецепт: Свежие ягоды облепихи, корень имбиря, цветочный мед и палочка цейлонской корицы."},
+            {n: "Ромашковый", r: "Рецепт: Цельные цветки аптечной ромашки высшей категории. Успокаивает и нормализует сон."},
+            {n: "Успокаивающий", r: "Рецепт: Фитосбор из мелиссы, лаванды и пустырника для глубокой релаксации организма."},
+            {n: "Желудочный", r: "Рецепт: Лечебный сбор (мята, семена льна, календула) для улучшения пищеварения и легкости."},
+            {n: "Печеночный", r: "Рецепт: Детокс-сбор из расторопши, плодов шиповника и кукурузных рылец."}
+        ]},
+        { name: "Десерты", items: [
+            {n: "Банан", r: "Производство: Экваториальный банан в карамельной глазури из тростникового сахара. Подается с мятой."},
+            {n: "Шоколад", r: "Производство: Плитка темного бельгийского шоколада 72%. Только какао-масло и бобы сорта Криолло."},
+            {n: "Шоколадное мороженое", r: "Рецепт: Сливочный пломбир с высоким содержанием темного шоколада и шоколадной крошкой внутри."},
+            {n: "Bubble Gum мороженое", r: "Рецепт: Авторское мороженое со вкусом классической жевательной резинки и натуральными экстрактами ягод."},
+            {n: "Ванильное мороженое", r: "Рецепт: Нежный сливочный десерт с семенами мадагаскарской ванили. Классика в лучшем исполнении."}
+        ]}
+    ];
 
-        const data = {
-            bread: { title: "Хлебцы", opts: ["Золотистые тосты", "С томатами на гриле", "Свежий хлеб"] },
-            shakshuka: { title: "Шакшука", opts: ["С тягучим сыром", "Свежая зелень", "Классическая пряная"] },
-            pasta: { title: "Паста", opts: ["Карбонара", "Четыре сыра", "С лесными грибами"] },
-            croutons: { title: "Гренки", opts: ["Чесночные", "С сыром", "Острые Чили"] },
-            salad: { title: "Салаты", opts: ["Цезарь", "Греческий", "Витаминный микс"] },
-            chips: { title: "Чипсы", opts: ["С паприкой", "Сметаной и луком", "Морская соль"] },
-            tea: { title: "Чай", opts: ["Иван-чай", "Облепиховый", "Ромашковый", "Печеночный", "Желудочный"] },
-            dessert: { title: "Десерты", opts: ["Бабл-гам", "Шоколадное мороженое", "Шоколад", "Спелый банан"] }
-        };
+    let cart = new Set();
+    const list = document.getElementById('menu-list');
 
-        let currentOrder = new Set();
+    menuData.forEach(dish => {
+        const card = document.createElement('div');
+        card.className = 'dish-card';
+        card.innerHTML = `
+            <div class="dish-header" onclick="this.parentElement.classList.toggle('active')">${dish.name}</div>
+            <div class="sub-categories">
+                ${dish.items.map(item => `
+                    <div class="sub-item">
+                        <div class="sub-item-header">
+                            <span class="sub-name">${item.n}</span>
+                            <div class="gold-check" onclick="toggle('${item.n}', this)"></div>
+                        </div>
+                        <span class="recipe-text">${item.r}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        list.appendChild(card);
+    });
 
-        function openCat(id) {
-            document.getElementById('main-menu').style.display = 'none';
-            const view = document.getElementById('cat-view');
-            view.style.display = 'block';
-            setTimeout(() => view.style.opacity = '1', 10);
-            document.getElementById('back-btn').style.display = 'block';
-            
-            const cat = data[id];
-            document.getElementById('cat-title').innerText = cat.title;
-            document.getElementById('options-list').innerHTML = cat.opts.map(opt => `
-                <div class="option">
-                    <span>${opt}</span>
-                    <input type="checkbox" onchange="toggleOrder('${opt}')" ${currentOrder.has(opt) ? 'checked' : ''}>
-                </div>
-            `).join('');
-            checkOrderButton();
-        }
+    function toggle(name, el) {
+        const parent = el.closest('.sub-item');
+        parent.classList.toggle('selected');
+        cart.has(name) ? cart.delete(name) : cart.add(name);
+        document.getElementById('submitBtn').style.display = cart.size > 0 ? 'block' : 'none';
+    }
 
-        function showMain() {
-            document.getElementById('main-menu').style.display = 'flex';
-            document.getElementById('cat-view').style.display = 'none';
-            document.getElementById('cat-view').style.opacity = '0';
-            document.getElementById('back-btn').style.display = 'none';
-        }
+    function send() {
+        emailjs.send("service_brsik8k", "template_vrunvtb", {
+            title: "VIP ЗАКАЗ",
+            message: Array.from(cart).join(", ")
+        }).then(() => {
+            alert("Ваш заказ отправлен!");
+            location.reload();
+        });
+    }
 
-        function toggleOrder(val) {
-            currentOrder.has(val) ? currentOrder.delete(val) : currentOrder.add(val);
-            checkOrderButton();
-        }
-
-        function checkOrderButton() {
-            const btn = document.getElementById('send-order-btn');
-            if (currentOrder.size > 0) {
-                btn.classList.add('visible');
-            } else {
-                btn.classList.remove('visible');
-            }
-        }
-
-        function sendOrder() {
-            const orderStr = Array.from(currentOrder).join(", ");
-            // Отправка на твой email
-            emailjs.send("service_8ktnzor", "template_default", { message: orderStr })
-            .then(() => {
-                alert("Благодарим. Ваш заказ принят.");
-                currentOrder.clear();
-                showMain();
-            });
-        }
-
-        function callWaiter() {
-            emailjs.send("service_8ktnzor", "template_default", { message: "🔔 ВЫЗОВ ОФИЦИАНТА" })
-            .then(() => alert("Официант приглашен."));
-        }
-    </script>
+    function call() {
+        emailjs.send("service_brsik8k", "template_vrunvtb", {
+            title: "ВЫЗОВ",
+            message: "Срочный вызов персонала к VIP столу"
+        }).then(() => alert("Персонал уведомлен."));
+    }
+</script>
 </body>
 </html>
